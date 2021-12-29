@@ -218,7 +218,7 @@ static bool _start_async_task(){
         return false;
     }
     if(!_async_service_task_handle){
-        xTaskCreateUniversal(_async_service_task, "async_tcp", 8192 * 2, NULL, 3, &_async_service_task_handle, CONFIG_ASYNC_TCP_RUNNING_CORE);
+        xTaskCreateUniversal(_async_service_task, "async_tcp", (8192 + 4096) * 2, NULL, 3, &_async_service_task_handle, CONFIG_ASYNC_TCP_RUNNING_CORE);
         if(!_async_service_task_handle){
             return false;
         }
@@ -706,12 +706,12 @@ bool AsyncClient::connect(IPAddress ip, uint16_t port){
 
 bool AsyncClient::connect(const char* host, uint16_t port){
     ip_addr_t addr;
-    
+
     if(!_start_async_task()){
       log_e("failed to start task");
       return false;
     }
-    
+
     err_t err = dns_gethostbyname(host, &addr, (dns_found_callback)&_tcp_dns_found, this);
     if(err == ERR_OK) {
         return connect(IPAddress(addr.u_addr.ip4.addr), port);
